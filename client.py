@@ -12,10 +12,15 @@ def client():
     s.connect((host, port))  # connect with the server
     s.send(b"Hello server!")  # communicate with the server
 
+    # get p, g primes
+    p = s.recv(1024)
+    g = s.recv(1024)
     with open('received_file', 'wb') as f:
         while True:
             print('Receiving data...')
             data = s.recv(1024)
+            print(p)
+            print(g)
             print('data=%s', (data))
             if not data:
                 break
