@@ -3,6 +3,7 @@ File transfer server code. Not multi-threaded.
 '''
 
 import socket   # Import socket module
+from sympy import randprime    # Import symbolic math library - prime generator
 
 port = 63000   # Reserve a port for your service (*client must connect with this port number)
 s = socket.socket()  # Create a socket object
@@ -22,17 +23,21 @@ def serve():
         print ('Got connection from', addr)
         data = conn.recv(1024)
         print('Server received', repr(data))
+
+        #sympy.ntheory.generate.randprime(1000,999999)  # Generate large random prime in range [a,b)
+        p = randprime(1000,999999)
+        
         # file to transfer
         filename='sample.txt'
-        f = open(filename,'r') #formerly rb
+        f = open(filename,'rb') #formerly rb
         l = f.read(1024)
         while (l):
-            conn.send(l)
+            conn.sendall(l) #send -> sendall b/c Python3
             print('Sent ',repr(l))
             l = f.read(1024)
         f.close()
         print('Done sending')
-        conn.send('File transfer complete!')
+        conn.send(b'File transfer complete!')
         conn.close()
 
 if __name__=='__main__':

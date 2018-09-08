@@ -10,7 +10,7 @@ def client():
     port = 63000   # Make sure that client pings server on correct port
 
     s.connect((host, port))  # connect with the server
-    s.send("Hello server!")  # communicate with the server
+    s.send(b"Hello server!")  # communicate with the server
 
     with open('received_file', 'wb') as f:
         while True:
