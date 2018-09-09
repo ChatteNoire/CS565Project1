@@ -3,8 +3,12 @@ File transfer server code. Not multi-threaded.
 '''
 
 import socket   # Import socket module
-from sympy import randprime    # Import symbolic math library - prime generator
+#from sympy import randprime    # Import symbolic math library - prime generator
+import sympy
+import math
+
 print (b'yooo')
+
 port = 63000   # Reserve a port for your service (*client must connect with this port number)
 s = socket.socket()  # Create a socket object
 host = socket.gethostname()  # Get local machine name
@@ -26,13 +30,35 @@ def serve():
         print('Server received', repr(data))
 
         #sympy.ntheory.generate.randprime(1000,999999)  # Generate large random prime in range [a,b)
-        p = randprime(1000,999999)
-        print(p) #print out prime
-        g = randprime(1000,999999)
-        print(g) #print out prime number g
+        p = sympy.randprime(200,9999)
+        print('p = ',p) #print out prime
+        g = sympy.randprime(2,1000)
+        # APPARENTLY g isn't random
+        # deal with eqn later g = math.exp((1%p)/(p-1))
+        print('g = ',g) #print out prime number g
+        
         #conn.sendall(p.encode('utf-8'))
-        conn.sendall(p.to_bytes(10,'little')) #10 bytes? 
-        conn.sendall(p.to_bytes(10,'little'))
+        conn.sendall(p.to_bytes(10,'big')) #10 bytes? 
+        conn.sendall(g.to_bytes(10,'big'))
+
+        p2 = sympy.randprime(2,2000)
+        print('p2 = ',p2)
+        Pk2 = pow(g, p2, p) #pow(x,y[,z]) computers g^(y)mod(z) more efficiently
+        print ('Pk2 = ',Pk2)
+
+        # Receive Pk1 from Client (1)
+        Pk1 = conn.recv(1024)
+        Pk1 = int.from_bytes(Pk1, byteorder='big')
+        print('Pk1 = ',Pk1)
+
+        # Send Pk2 to Client (2)
+        conn.sendall(Pk2.to_bytes(10,'big'))
+
+        # Get Client Shared Key
+        Pk1_p2 = pow(Pk1, p2)
+        Pk1_p2 = Pk1_p2 % p
+        print('Shared DH key: ', Pk1_p2)
+        
         # file to transfer
         filename='sample.txt'
         f = open(filename,'rb') #formerly rb
