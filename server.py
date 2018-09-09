@@ -1,20 +1,34 @@
+# Victoria Van
+# CS 565
+# September 14, 2018
+# Professor T. Mukherjee
+# Project 1: Diffie-Hellman *SERVER*
+# --------------------------------------
+# Description: 
+# This program is the server binds to a port and listens to a server
+# socket.  The client and server agree on a shared keys 'p' and 'g'
+# with the server. Server randomly generates prime 'p2' which is used
+# to get Pk2.  The client and server swap public keys and use their own
+# private keys to generate the encryption key. The server encrypts the
+# input file and sends it the client, which decrypts it with the
+# generated key.  The result should be the same as the original input file.
+# --------------------------------------
+# Code template provided by Professor T.  
+
 '''
 File transfer server code. Not multi-threaded.
 '''
 
-import socket   # Import socket module
-#from sympy import randprime    # Import symbolic math library - prime generator
-import sympy
-import math
-from Crypto.Cipher import AES
-import hashlib
-
-print (b'yooo')
+import socket                   # Import socket module  
+import sympy                    # Import symbolic math library - prime generator
+import math                     # power function library
+from Crypto.Cipher import AES   # AES encryption library
+import hashlib                  # hash library (MD5)
+import base64                   # binary to plain text library
 
 port = 63000   # Reserve a port for your service (*client must connect with this port number)
 s = socket.socket()  # Create a socket object
 host = socket.gethostname()  # Get local machine name
-#s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #reuse addr port immediately stead stuck in TIME_WAIT
 s.bind((host, port))  # Bind to the port
 s.listen(5)  # Now wait for client connection and listen for requests
 
@@ -28,7 +42,7 @@ def serve():
     while True:
         conn, addr = s.accept()     # Establish connection with client, returns a tuple 
         print ('Got connection from', addr)
-        data = conn.recv(1024)
+        data = conn.recv(1024)      # 
         print('Server received', repr(data))
 
         #sympy.ntheory.generate.randprime(1000,999999)  # Generate large random prime in range [a,b)
@@ -66,16 +80,21 @@ def serve():
         f = open(filename,'r') #formerly rb
         #l = f.read(1024)
         l = f.read()
+        l = str.encode(l)
+        l = l.rjust(32)
         print('read: ',l)
 
         #debugging
-        l = 'hi there'
+        #l = b'hi there'.rjust(32)
         
         # Encrypt file
         Pk1_p2 = Pk1_p2.to_bytes(16,'big')
         print(Pk1_p2)
-        cipher_aes = AES.new(Pk1_p2, AES.MODE_EAX)
-        ciphertext = cipher_aes.encrypt(l.encode("utf-8").strip()) 
+        #cipher_aes = AES.new(Pk1_p2, AES.MODE_EAX)
+        #ciphertext = cipher_aes.encrypt(l.encode("utf-8").strip())
+        
+        cipher = AES.new(Pk1_p2, AES.MODE_ECB)
+        ciphertext = base64.b64encode(cipher.encrypt(l))
         print('Ciphertext: ',ciphertext)
 
         #debugging
