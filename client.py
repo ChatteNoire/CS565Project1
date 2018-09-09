@@ -1,5 +1,7 @@
 import socket
 import sympy
+import Crypto.Cipher
+import hashlib
 
 def client():
     """
@@ -22,7 +24,7 @@ def client():
     g = int.from_bytes(g, byteorder='big')
     print('p = ',p)
     print('g = ',g)
-    p1 = sympy.randprime(2,2000)
+    p1 = 211 #sympy.randprime(2,2000)
     print('p1 = ',p1)
     Pk1 = pow(g, p1, p) #pow(x,y[,z]) computers g^(y)mod(z) more efficiently
     print ('Pk1 = ',Pk1)
@@ -40,17 +42,26 @@ def client():
     Pk2_p1 = Pk2_p1 % p
     print('Shared DH key: ', Pk2_p1)
     
-    
-    with open('received_file', 'wb') as f:
+    #encrypted = bytearray(b'')
+    encrypted = b''
+    with open('received_file', 'w') as f: # formerly wb
         while True:
             print('Receiving data...')
-            data = s.recv(1024)
+            data = s.recv(1024) #formerly 1024
+            # Check MD5 hash
 
-            print('data=%s', (data))
+            print('data = ', (data))
             if not data:
                 break
+            encrypted += data
             # write data to a file
-            f.write(data)
+            #f.write(data)
+            
+        md5check = hashlib.md5(encrypted)
+        print(encrypted)
+        print(md5check)
+
+
 
     f.close()
     print('Successfully obtained file from server')
