@@ -40,8 +40,8 @@ def serve():
         print('g = ',g) #print out prime number g
         
         #conn.sendall(p.encode('utf-8'))
-        conn.sendall(p.to_bytes(10,'big')) #10 bytes? 
-        conn.sendall(g.to_bytes(10,'big'))
+        conn.sendall(p.to_bytes(16,'big')) #10 bytes? 
+        conn.sendall(g.to_bytes(16,'big'))
 
         p2 = 163 #sympy.randprime(2,2000)
         print('p2 = ',p2)
@@ -67,15 +67,22 @@ def serve():
         #l = f.read(1024)
         l = f.read()
         print('read: ',l)
+
+        #debugging
+        l = 'hi there'
         
         # Encrypt file
         Pk1_p2 = Pk1_p2.to_bytes(16,'big')
+        print(Pk1_p2)
         cipher_aes = AES.new(Pk1_p2, AES.MODE_EAX)
-        ciphertext = cipher_aes.encrypt(l.encode("utf-8")) 
+        ciphertext = cipher_aes.encrypt(l.encode("utf-8").strip()) 
         print('Ciphertext: ',ciphertext)
 
+        #debugging
+        #ciphertext = b'abcd'
+        
         # Implement MD5 hash on Ciphertext
-        md5hash = hashlib.md5(ciphertext)
+        md5hash = hashlib.md5(ciphertext).hexdigest()
         print(md5hash)
         
         #while (l):

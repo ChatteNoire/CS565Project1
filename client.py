@@ -1,6 +1,6 @@
 import socket
 import sympy
-import Crypto.Cipher
+from Crypto.Cipher import AES
 import hashlib
 
 def client():
@@ -44,7 +44,7 @@ def client():
     
     #encrypted = bytearray(b'')
     encrypted = b''
-    with open('received_file', 'w') as f: # formerly wb
+    with open('received_file', 'wb') as f: # formerly wb
         while True:
             print('Receiving data...')
             data = s.recv(1024) #formerly 1024
@@ -57,11 +57,18 @@ def client():
             # write data to a file
             #f.write(data)
             
-        md5check = hashlib.md5(encrypted)
+        md5check = hashlib.md5(encrypted).hexdigest()
         print(encrypted)
         print(md5check)
+        
+    # Decrypt file
+    Pk2_p1 = Pk2_p1.to_bytes(16,'big')
+    cipher = AES.new(Pk2_p1, AES.MODE_EAX)
+    plaintext = cipher.decrypt(encrypted)
+    print('Plainttext: ',plaintext.decode("utf-8").strip())
 
-
+    # write data to a file
+    f.write(plaintext)
 
     f.close()
     print('Successfully obtained file from server')
