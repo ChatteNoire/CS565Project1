@@ -106,6 +106,10 @@ def serve():
         conn.sendall(ciphertext)  #send -> sendall b/c Python3
         print('\nSent ',repr(ciphertext)) # print ciphertext sent to client
 
+        # Client acknowledges transfer completed
+        thankyou = conn.recv(1024)
+        print(thankyou)
+
         # Implement MD5 hash on Ciphertext
         md5hash = hashlib.md5(ciphertext).hexdigest()
         print('\nMD5 Hash: ',md5hash)

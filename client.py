@@ -70,14 +70,25 @@ def client():
     #encrypted = bytearray(b'')
     encrypted = b''
     with open('received_file.txt', 'wb') as f: # formerly wb
-        while True:
-            print('Receiving data...')
-            data = s.recv(1024) # formerly 1024
+       # while True:
+        #    print('Receiving data...')
+           # data = s.recv(1024) # formerly 1024
 
-            print('data = ', (data))
-            if not data:
-                break
-            encrypted += data
+        #    print('data = ', (data))
+        #    if not data:
+          #      break
+           # encrypted += data
+
+        
+        print('Receiving data...')
+        data = s.recv(1024) # formerly 1024
+
+        print('data = ', (data))
+        #if not data:
+         #   break
+        encrypted += data
+
+        s.send(b'Transfer completed!\n')
 
         # Generate MD5 hash of received encrypted file    
         md5check = hashlib.md5(encrypted).hexdigest()
