@@ -70,16 +70,6 @@ def client():
     #encrypted = bytearray(b'')
     encrypted = b''
     with open('received_file.txt', 'wb') as f: # formerly wb
-       # while True:
-        #    print('Receiving data...')
-           # data = s.recv(1024) # formerly 1024
-
-        #    print('data = ', (data))
-        #    if not data:
-          #      break
-           # encrypted += data
-
-        
         print('Receiving data...')
         data = s.recv(1024) # formerly 1024
 
@@ -97,8 +87,11 @@ def client():
 
         # Receive MD5 hash from server to check
         md5hashCompare = s.recv(1024) # receive MD5 hash
+        md5hashCompare = md5hashCompare.decode('utf-8')   # b' to str
         if md5hashCompare != md5check:  # check if MD5 hash from server matches with client's
             print('\nMD5 hashes DO NOT match!!!\n')     # hashes do NOT match
+            print('MD5 of Server\t', md5hashCompare)
+            print('MD5 of Client\t', md5check)
         else:
             print('\nMD5 hashes match.\n')        # hashes match!
         
