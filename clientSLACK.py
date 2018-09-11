@@ -81,8 +81,8 @@ def client():
 
         # Generate MD5 hash of received encrypted file    
         md5check = hashlib.md5(encrypted).hexdigest()
-        print('\nEncrypted data received: ',encrypted)
-        print('\nMD5 Hash: ',md5check)
+        print('Encrypted data received: ',encrypted)
+        print('MD5 Hash: ',md5check)
 
         # Receive MD5 hash from server to check
         md5hashCompare = s.recv(1024) # receive MD5 hash

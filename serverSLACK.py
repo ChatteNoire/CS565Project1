@@ -49,10 +49,6 @@ def serve():
         p = sympy.randprime(200,9999)   # random prime generator for 'p'
         print('p = ',p) # print out prime
         g = sympy.randprime(2,1000)     # shared value g
-        #while g > p:   # g has to be less than p
-         #   g = sympy.randprime(2,1000) # random 'p1' prime (secret)
-        # g = (2*p + 1) ** (1/(p-1))  # g^(p-1) = 1 (mod p)
-        
         # Lecture notes!  g = math.exp((1%p)/(p-1))
         print('g = ',g) # print out prime number g
         
@@ -100,20 +96,20 @@ def serve():
         # AES encryption with key
         cipher = AES.new(Pk1_p2, AES.MODE_ECB) # create new AES cipher
         ciphertext = base64.b64encode(cipher.encrypt(l)) # encrypt 'l' file text
-        print('\nCiphertext: ',ciphertext)
+        print('Ciphertext: ',ciphertext)
 
         # Send encrypted file
         conn.sendall(ciphertext)  #send -> sendall b/c Python3
-        print('\nSent ',repr(ciphertext)) # print ciphertext sent to client
+        print('Sent ',repr(ciphertext)) # print ciphertext sent to client
 
         # Implement MD5 hash on Ciphertext
         md5hash = hashlib.md5(ciphertext).hexdigest()
-        print('\nMD5 Hash: ',md5hash)
+        print('MD5 Hash: ',md5hash)
         conn.sendall(str.encode(md5hash)) # send md5hash for comparison
         
         f.close()   # close input file
         print('Done sending')
-        #conn.send(b'File transfer complete!')
+        conn.send(b'File transfer complete!')
         conn.close() # close socket connection
 
 if __name__=='__main__':
