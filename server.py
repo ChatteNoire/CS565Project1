@@ -25,6 +25,9 @@ import math                     # power function library
 from Crypto.Cipher import AES   # AES encryption library
 import hashlib                  # hash library (MD5)
 import base64                   # binary to plain text library
+from sympy.ntheory.residue_ntheory import _primitive_root_prime_iter
+                                # library for primitive roots modulo n (g)
+import random                   # library for randomly picking g from list of g
 
 port = 63000   # Reserve a port for your service (*client must connect with this port number)
 s = socket.socket()  # Create a socket object
@@ -47,22 +50,32 @@ def serve():
 
         # Agree on shared prime 'p' and shared key 'g'
         p = sympy.randprime(200,9999)   # random prime generator for 'p'
-        # restricted prime from 200 to 9999 for time sake
+        # restricted prime from 200 to 9999 for time & computation sake
         
         print('p = ',p) # print out prime
         
-        g = sympy.randprime(2,1000)     # shared value g
-        print('g = ',g) # print out prime number g
-        check_g = pow(g,p-1,p)  # g^(p-1) = 1 (mod p)
+        #gList = sympy.ntheory.residue_ntheory._primitive_root_prime_iter(19)
+        gList = list(_primitive_root_prime_iter(p))
+        # generate array of possible g values
+        # print(gList)  # Debugging!
+        randomG = random.SystemRandom()
+        g = randomG.choice(gList)   # get random primitive root modulo from array
+        print('g = ', g)
+
         
-        while (g > p) and (check_g != 1):
+        
+#        g = sympy.randprime(2,1000)     # shared value g
+#        print('g = ',g) # print out prime number g
+#        check_g = pow(g,p-1,p)  # g^(p-1) = 1 (mod p)
+        
+#        while (g > p) and (check_g != 1):
         # g has to be less than p and satisfy g^(p-1) = 1 (mod p)
-            g = sympy.randprime(2,1000) # shared value g
-            print('g = ',g) # print out prime number g
-            check_g = pow(g,p-1,p)  # g^(p-1) = 1 (mod p)
+#            g = sympy.randprime(2,1000) # shared value g
+#            print('g = ',g) # print out prime number g
+#            check_g = pow(g,p-1,p)  # g^(p-1) = 1 (mod p)
 
         # If get out of previous while loop, g should satisify equation
-        print('g satisifies g^(p-1) = 1 (mod p)')
+#        print('g satisifies g^(p-1) = 1 (mod p)')
         
         conn.sendall(p.to_bytes(16,'big'))  # send 'p' as bytes, 16 B, big endian
         conn.sendall(g.to_bytes(16,'big'))  # send 'g' to client
