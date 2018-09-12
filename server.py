@@ -47,14 +47,22 @@ def serve():
 
         # Agree on shared prime 'p' and shared key 'g'
         p = sympy.randprime(200,9999)   # random prime generator for 'p'
-        print('p = ',p) # print out prime
-        g = sympy.randprime(2,1000)     # shared value g
-        #while g > p:   # g has to be less than p
-         #   g = sympy.randprime(2,1000) # random 'p1' prime (secret)
-        # g = (2*p + 1) ** (1/(p-1))  # g^(p-1) = 1 (mod p)
+        # restricted prime from 200 to 9999 for time sake
         
-        # Lecture notes!  g = math.exp((1%p)/(p-1))
+        print('p = ',p) # print out prime
+        
+        g = sympy.randprime(2,1000)     # shared value g
         print('g = ',g) # print out prime number g
+        check_g = pow(g,p-1,p)  # g^(p-1) = 1 (mod p)
+        
+        while (g > p) and (check_g != 1):
+        # g has to be less than p and satisfy g^(p-1) = 1 (mod p)
+            g = sympy.randprime(2,1000) # shared value g
+            print('g = ',g) # print out prime number g
+            check_g = pow(g,p-1,p)  # g^(p-1) = 1 (mod p)
+
+        # If get out of previous while loop, g should satisify equation
+        print('g satisifies g^(p-1) = 1 (mod p)')
         
         conn.sendall(p.to_bytes(16,'big'))  # send 'p' as bytes, 16 B, big endian
         conn.sendall(g.to_bytes(16,'big'))  # send 'g' to client

@@ -20,6 +20,7 @@ import sympy                        # random prime generator library
 from Crypto.Cipher import AES       # AES encryption library
 import hashlib                      # hash library (MD5)
 import base64                       # binary to plain text library
+import os                           # library for Windows print to file with \n
 
 def client():
     """
@@ -99,10 +100,17 @@ def client():
         Pk2_p1 = Pk2_p1.to_bytes(16,'big')  # convert Pk2_p1 to bytes, big endian
         cipher = AES.new(Pk2_p1, AES.MODE_ECB)  # create new AES cipher
         plaintext = cipher.decrypt(base64.b64decode(encrypted)) # decrypt encrypted file
-        print('Plainttext: ',plaintext.decode("utf-8")) # VV note: removed .strip()
+        plaintextPrint = plaintext.decode("utf-8")
+        print('Plainttext: \n',plaintextPrint) # VV note: removed .strip()
 
         # write data to a file
         f.write(plaintext.lstrip()) # lstrip removes whitespace before text
+        #f.write(plaintext())
+        #f.writelines(plaintext.to_bytes(16,'big'))
+        #plaintext = plaintext.to_bytes(16,'big')
+        #print(plaintext)
+        #f.write(plaintext + os.linesep)
+
 
     f.close() # close output file
     print('Successfully obtained file from server')
