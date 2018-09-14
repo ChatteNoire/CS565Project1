@@ -37,6 +37,8 @@ def client():
     # Agree on 'p' and 'g' primes
     p = s.recv(1024)    # socket will read at most 1024 bytes, get 'p' prime
     g = s.recv(1024)    # receive 'g' prime
+    print(p,' len=>',len(p))
+    print(g,' len=>',len(g))
     p = int.from_bytes(p, byteorder='big')  # Bytes-> int (big endian) of p
     g = int.from_bytes(g, byteorder='big')  # Bytes-> int (big endian) of g
     print('p = ',p) # debugging p
@@ -60,22 +62,23 @@ def client():
     Pk2 = s.recv(1024)
     Pk2 = int.from_bytes(Pk2, byteorder='big')  # convert Pk2 bytes -> int
     print('Pk2 = ',Pk2)
-
-    DataSize = s.recv(1024) # receive data's size so know when padding starts
-    DataSize = int.from_bytes(DataSize, byteorder='big') # byte->int
-    print('DataSize: ', DataSize)   # Debugging 
-    
+#LV
+    DataSize=s.recv(1024)
+    DataSize=int.from_bytes(DataSize,byteorder='big')
+    print ('DataSize=>',DataSize)
+#LV    
     # Get Server Shared Key (3)
     Pk2_p1 = pow(Pk2, p1)
     Pk2_p1 = Pk2_p1 % p
     print('\nShared DH key: ', Pk2_p1)
     
-    encrypted = b'' # storing encrypted ciphertext in bytes
-    with open('received_file.txt', 'wb') as f: # write as byte
+    #encrypted = bytearray(b'')
+    encrypted = b''
+    with open('received_file.txt', 'wb') as f: # formerly wb
         print('Receiving data...')
-        data = s.recv(1024) # receiving the ciphertext
+        data = s.recv(1024) # formerly 1024
 
-        print('data = ', (data)) # debugging
+        print('data = ', (data))
         #if not data:
          #   break
         encrypted += data
@@ -96,21 +99,23 @@ def client():
             print('MD5 of Client\t', md5check)
         else:
             print('\nMD5 hashes match.\n')        # hashes match!
-            print('MD5 of Server\t', md5hashCompare)
-            print('MD5 of Client\t', md5check)
         
         # Decrypt file
         Pk2_p1 = Pk2_p1.to_bytes(16,'big')  # convert Pk2_p1 to bytes, big endian
         cipher = AES.new(Pk2_p1, AES.MODE_ECB)  # create new AES cipher
         plaintext = cipher.decrypt(base64.b64decode(encrypted)) # decrypt encrypted file
-        print('Plaintext [B]: ', plaintext, '\nLength: ', len(plaintext))#debugging
-
-        plaintextPrint = plaintext.decode("utf-8") 
-        print('Plainttext: \n',plaintextPrint[:DataSize])
-        # only print file's data (no padding)
+        print('plaintext=>',plaintext,' len=>',len(plaintext))
+        plaintextPrint = plaintext.decode("utf-8")
+        print('Plainttext: \n',plaintextPrint[:DataSize]) # VV note: removed .strip()
 
         # write data to a file
-        f.write(plaintext[:DataSize]) # only print file's data (no padding) to output file
+        f.write(plaintext[:DataSize])#.lstrip()) # lstrip removes whitespace before text
+        #f.write(plaintext())
+        #f.writelines(plaintext.to_bytes(16,'big'))
+        #plaintext = plaintext.to_bytes(16,'big')
+        #print(plaintext)
+        #f.write(plaintext + os.linesep)
+
 
     f.close() # close output file
     print('Successfully obtained file from server')

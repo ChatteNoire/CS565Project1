@@ -66,7 +66,6 @@ def serve():
 
         # Generate secret prime 'p2'
         p2 = sympy.randprime(2,2000)    # random prime 'p2'
-        # restricted p2 from 2 to 2000
         while p2 == p:   # p2 != p
             p2 = sympy.randprime(2,2000) # random 'p2' prime (secret)
                 
@@ -91,15 +90,14 @@ def serve():
         
         # file to transfer
         filename='sample.txt'
-        f = open(filename,'rb') # read bytes from file
-        # If reading string, doesn't account for carriage return, so read as byte
+        f = open(filename,'r') #formerly rb from template (read all at once)
         l = f.read()    # extract contents of file
+        l = l.rjust(32) # right justified, width of string
+        l = str.encode(l)   # l as a string to bytes
+        print('read: ',l)
 
-        DataSize = len(l)   # length of file data
-        if (DataSize % 16 != 0): 
-            l += b' '*(16-DataSize % 16)    # pad with spaces
-        conn.sendall(DataSize.to_bytes(16,'big'))
-        print('File: ', l,'\nLength of file: ', len(l)) # make sure match client
+        # debugging 
+        #l = b'Hi there'.rjust(32)
         
         # Encrypt file
         Pk1_p2 = Pk1_p2.to_bytes(16,'big') # convert shared key to bytes
